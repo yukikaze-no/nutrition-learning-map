@@ -22,6 +22,66 @@
   .node circle{stroke:#333; stroke-width:1;}
   .node text{pointer-events:none; font-size:11px; fill:#111;}
   .tooltip{position:absolute; background:rgba(0,0,0,0.78); color:#fff; padding:6px 8px; border-radius:6px; font-size:12px; pointer-events:none; display:none; max-width:380px;}
+
+
+  /* Smartphone and tablet layout */
+  @media (max-width: 768px) {
+    body { overflow-x: hidden; }
+    header {
+      padding: 10px 12px;
+      gap: 8px;
+      align-items: center;
+    }
+    header strong {
+      width: 100%;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+    header .btn {
+      padding: 8px 12px;
+      min-height: 42px;
+      font-size: 16px;
+    }
+    header select {
+      min-height: 42px;
+      max-width: calc(100vw - 24px);
+      font-size: 16px;
+    }
+    #wrap {
+      display: block;
+      height: auto;
+    }
+    #graph {
+      display: block;
+      width: 100%;
+      height: 68vh;
+      min-height: 480px;
+      border-bottom: 1px solid #ddd;
+      overflow: hidden;
+      touch-action: none;
+    }
+    #side {
+      box-sizing: border-box;
+      display: block;
+      width: 100%;
+      max-width: none;
+      min-height: 280px;
+      border-left: 0;
+      border-top: 1px solid #ddd;
+      padding: 14px 16px 28px;
+      overflow: visible;
+    }
+    .node text { font-size: 13px; }
+    .tooltip { max-width: calc(100vw - 32px); }
+  }
+
+  @media (max-width: 430px) {
+    #graph {
+      height: 64vh;
+      min-height: 430px;
+    }
+  }
+
 </style>
 </head>
 <body>
@@ -171,6 +231,7 @@ function render(){
   });
 
   // zoom
+  svg.on('.zoom', null);
   svg.call(d3.zoom().scaleExtent([0.2, 3]).on('zoom', (event) => { g.attr('transform', event.transform); }));
 
   function dragstarted(event, d) {
