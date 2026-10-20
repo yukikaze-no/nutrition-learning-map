@@ -23,63 +23,24 @@
   .node text{pointer-events:none; font-size:11px; fill:#111;}
   .tooltip{position:absolute; background:rgba(0,0,0,0.78); color:#fff; padding:6px 8px; border-radius:6px; font-size:12px; pointer-events:none; display:none; max-width:380px;}
 
-
-  /* Smartphone and tablet layout */
-  @media (max-width: 768px) {
-    body { overflow-x: hidden; }
-    header {
-      padding: 10px 12px;
-      gap: 8px;
-      align-items: center;
-    }
-    header strong {
-      width: 100%;
-      font-size: 18px;
-      line-height: 1.35;
-    }
-    header .btn {
-      padding: 8px 12px;
-      min-height: 42px;
-      font-size: 16px;
-    }
-    header select {
-      min-height: 42px;
-      max-width: calc(100vw - 24px);
-      font-size: 16px;
-    }
-    #wrap {
-      display: block;
-      height: auto;
-    }
-    #graph {
-      display: block;
-      width: 100%;
-      height: 68vh;
-      min-height: 480px;
-      border-bottom: 1px solid #ddd;
-      overflow: hidden;
-      touch-action: none;
-    }
-    #side {
-      box-sizing: border-box;
-      display: block;
-      width: 100%;
-      max-width: none;
-      min-height: 280px;
-      border-left: 0;
-      border-top: 1px solid #ddd;
-      padding: 14px 16px 28px;
-      overflow: visible;
-    }
-    .node text { font-size: 13px; }
-    .tooltip { max-width: calc(100vw - 32px); }
-  }
-
-  @media (max-width: 430px) {
-    #graph {
-      height: 64vh;
-      min-height: 430px;
-    }
+  #mapControls{position:absolute;right:12px;bottom:12px;display:flex;gap:8px;z-index:10}
+  #mapControls button{min-width:44px;height:44px;border:1px solid #555;border-radius:10px;background:rgba(255,255,255,.94);font-size:22px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.18);touch-action:manipulation}
+  #mapControls #zoomReset{min-width:58px;font-size:14px}
+  #graph{-webkit-user-select:none;user-select:none;overscroll-behavior:contain}
+  @media (max-width:768px){
+    body{overflow-x:hidden}
+    header{padding:10px 12px;gap:8px;align-items:center}
+    header strong{width:100%;font-size:18px;line-height:1.35}
+    header .btn{padding:8px 12px;min-height:42px;font-size:16px}
+    header select{min-height:42px;max-width:calc(100vw - 24px);font-size:16px}
+    #wrap{display:block;height:auto}
+    #graph{display:block;width:100%;height:68vh;min-height:480px;border-bottom:1px solid #ddd;overflow:hidden;touch-action:none}
+    #side{box-sizing:border-box;display:block;width:100%;max-width:none;min-height:280px;border-left:0;border-top:1px solid #ddd;padding:14px 16px 28px;overflow:visible}
+    .node text{font-size:13px}
+    .tooltip{max-width:calc(100vw - 32px)}
+    #mapControls{position:sticky;float:right;right:10px;bottom:10px;margin-top:-58px;margin-right:10px}
+    #mapControls button{width:48px;height:48px;font-size:24px}
+    #mapControls #zoomReset{width:62px;font-size:14px}
   }
 
 </style>
@@ -91,13 +52,18 @@
   <button class="btn" id="bL12">L1+L2</button>
   <button class="btn" id="bAll">ALL</button>
   <span style="margin-left:8px;">カテゴリ:</span>
-  <select id="cat">
-    <option value="ALL">ALL</option>
-    <option value="体を育もう">体を育もう</option>
-    <option value="知を育もう">知を育もう</option>
-    <option value="徳を育もう">徳を育もう</option>
-    <option value="才を育もう">才を育もう</option>
-    <option value="食育栄養アドバイザー">食育栄養アドバイザー</option>
+  <select id="cat" aria-label="表示する学習領域">
+    <option value="ALL">すべて表示</option>
+    <optgroup label="食生活アドバイザー">
+      <option value="食生活アドバイザー">食生活アドバイザー：全領域</option>
+      <option value="体を育もう">　体を育もう</option>
+      <option value="知を育もう">　知を育もう</option>
+      <option value="徳を育もう">　徳を育もう</option>
+      <option value="才を育もう">　才を育もう</option>
+    </optgroup>
+    <optgroup label="食育栄養アドバイザー">
+      <option value="食育栄養アドバイザー">食育栄養アドバイザー：全領域</option>
+    </optgroup>
   </select>
   <span style="color:#666;font-size:12px;">※D3のCDNを使うためネット接続が必要</span>
 </header>
@@ -105,13 +71,18 @@
   <div id="graph">
     <div class="tooltip" id="tip"></div>
     <svg id="svg"></svg>
+    <div id="mapControls" aria-label="マップ操作">
+      <button type="button" id="zoomIn" aria-label="拡大">＋</button>
+      <button type="button" id="zoomOut" aria-label="縮小">−</button>
+      <button type="button" id="zoomReset" aria-label="全体表示">全体</button>
+    </div>
   </div>
   <aside id="side">
     <div style="background:#f6f1fa;border-left:4px solid #9467bd;padding:8px 10px;margin-bottom:12px;font-size:12px;line-height:1.5"><b>紫色の追加領域</b><br>公開カリキュラムを基に学習用として再構成した内容です。公式教材・試験範囲の完全な再現ではありません。</div>
     <h2>選択ノード</h2>
     <div class="meta" id="meta">ノードをクリックすると詳細が表示されます。</div>
     <h2>使い方</h2>
-    <div class="meta">上のボタンで <b>L1/L2/L3</b> の表示範囲を切替できます。カテゴリで4象限相当の絞り込みも可能です。</div>
+    <div class="meta">上のボタンで <b>L1/L2/L3</b> の表示範囲を切り替えます。表示リストでは資格別・領域別に絞り込めます。スマホでは1本指で移動し、右下の＋・−・全体ボタンで拡大縮小する操作が安定します。</div>
   </aside>
 </div>
 
@@ -134,6 +105,7 @@ window.addEventListener('resize', () => { resize(); render(); });
 
 let currentMode = 'L1';
 let currentCat = 'ALL';
+let activeZoom = null;
 
 function allowedLevel(level){
   if(level==='') return true; // big/mid nodes always
@@ -144,7 +116,12 @@ function allowedLevel(level){
 
 function allowedCat(category, type){
   if(currentCat==='ALL') return true;
-  // for big category nodes: category is its own label
+  if(currentCat==='食生活アドバイザー') {
+    return ['体を育もう','知を育もう','徳を育もう','才を育もう'].includes(category);
+  }
+  if(currentCat==='食育栄養アドバイザー') {
+    return category==='食育栄養アドバイザー';
+  }
   return category===currentCat;
 }
 
@@ -232,7 +209,12 @@ function render(){
 
   // zoom
   svg.on('.zoom', null);
-  svg.call(d3.zoom().scaleExtent([0.2, 3]).on('zoom', (event) => { g.attr('transform', event.transform); }));
+  activeZoom = d3.zoom()
+    .scaleExtent([0.25, 4])
+    .clickDistance(8)
+    .tapDistance(12)
+    .on('zoom', (event) => { g.attr('transform', event.transform); });
+  svg.call(activeZoom).on('dblclick.zoom', null);
 
   function dragstarted(event, d) {
     if (!event.active) sim.alphaTarget(0.3).restart();
@@ -255,6 +237,15 @@ document.getElementById('bL12').onclick = () => setMode('L12');
 document.getElementById('bAll').onclick = () => setMode('ALL');
 
 document.getElementById('cat').onchange = (e) => { currentCat = e.target.value; render(); };
+document.getElementById('zoomIn').onclick = () => {
+  if(activeZoom) svg.transition().duration(180).call(activeZoom.scaleBy, 1.35);
+};
+document.getElementById('zoomOut').onclick = () => {
+  if(activeZoom) svg.transition().duration(180).call(activeZoom.scaleBy, 1/1.35);
+};
+document.getElementById('zoomReset').onclick = () => {
+  if(activeZoom) svg.transition().duration(220).call(activeZoom.transform, d3.zoomIdentity);
+};
 
 resize();
 render();
